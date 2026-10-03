@@ -4,7 +4,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -13,6 +12,7 @@ import com.internportal.model.User;
 import com.internportal.service.AuthException;
 import com.internportal.service.AuthService;
 import com.internportal.util.SessionManager;
+import com.internportal.view.Navigator;
 import javax.swing.SwingWorker;
 import java.util.concurrent.ExecutionException;
 import java.awt.Color;
@@ -192,11 +192,8 @@ public class LoginFrame extends JFrame {
         SessionManager.getInstance().login(user);
         passwordField.setText("");
 
-        // TODO (Step 4): open AdminDashboard or StudentDashboard based on role, then dispose() this frame.
-        JOptionPane.showMessageDialog(this,
-                "Welcome, " + user.getFullName() + "!\nRole: " + user.getRole()
-                        + "\n\nThe dashboard will be added in Step 4.",
-                "Login successful", JOptionPane.INFORMATION_MESSAGE);
+        Navigator.openDashboardFor(user);   // open the dashboard first, then close the login window
+        dispose();
     }
 
     private void setLoading(boolean loading) {
@@ -206,10 +203,8 @@ public class LoginFrame extends JFrame {
     }
 
     private void onRegisterClicked() {
-        // TODO (Step 3): open RegisterFrame and dispose() this frame.
-        JOptionPane.showMessageDialog(this,
-                "The Register screen will be added in a later step.",
-                "Register", JOptionPane.INFORMATION_MESSAGE);
+        new RegisterFrame().setVisible(true);
+        dispose();
     }
 
     // ---------------------------------------------------------------- Helpers

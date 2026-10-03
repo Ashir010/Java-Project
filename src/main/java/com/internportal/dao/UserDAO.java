@@ -28,6 +28,17 @@ public class UserDAO {
         return Optional.empty();
     }
 
+    public boolean emailExists(String email) throws SQLException {
+        String sql = "SELECT 1 FROM users WHERE email = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     public boolean adminExists() throws SQLException {
         String sql = "SELECT COUNT(*) FROM users WHERE role = 'ADMIN'";
         try (Connection con = DBConnection.getConnection();
@@ -38,11 +49,17 @@ public class UserDAO {
         }
     }
 
-    /** Inserts a user (passwordHash must already be hashed). Returns the new user_id. */
+    /** Inserts a user using its own connection. passwordHash must already be hashed. Returns the new user_id. */
     public int insert(User user) throws SQLException {
+        try (Connection con = DBConnection.getConnection()) {
+            return insert(con, user);
+        }
+    }
+
+    /** Inserts a user using the caller's connection (so it can be part of a transaction). */
+    public int insert(Connection con, User user) throws SQLException {
         String sql = "INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)";
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPasswordHash());
