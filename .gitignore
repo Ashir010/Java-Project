@@ -1,0 +1,16 @@
+# Compiled output
+target/
+*.class
+
+# Local secrets — do NOT commit real DB credentials
+src/main/resources/db.properties
+
+# Editor / tooling
+.claude/
+.idea/
+*.iml
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store

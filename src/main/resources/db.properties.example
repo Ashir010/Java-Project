@@ -1,0 +1,5 @@
+# Copy this file to db.properties and fill in your own MySQL credentials.
+# db.properties is git-ignored so your real password is never committed.
+db.url=jdbc:mysql://localhost:3306/internship_portal?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+db.user=root
+db.password=CHANGE_ME
