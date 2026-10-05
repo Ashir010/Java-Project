@@ -30,7 +30,7 @@ public class StatusCellRenderer extends DefaultTableCellRenderer {
         return this;
     }
 
-    private static Color colorFor(String status) {
+    public static Color colorFor(String status) {
         switch (status) {
             case "OPEN":
             case "SELECTED":

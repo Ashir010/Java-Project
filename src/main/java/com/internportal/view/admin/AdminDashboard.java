@@ -12,7 +12,7 @@ public class AdminDashboard extends DashboardFrame {
         addPage("Overview", new PlaceholderPanel("Overview & Reports"));
         addPage("Students", new PlaceholderPanel("Students"));
         addPage("Companies & Internships", new CompaniesInternshipsPanel());
-        addPage("Applications", new PlaceholderPanel("Applications"));
+        addPage("Applications", new ApplicationsPanel());
         addPage("Logbooks", new PlaceholderPanel("Logbooks"));
         addPage("Documents", new PlaceholderPanel("Documents"));
 

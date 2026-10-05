@@ -2,6 +2,7 @@ package com.internportal.view.auth;
 
 import com.internportal.service.AuthException;
 import com.internportal.service.RegistrationService;
+import com.internportal.util.Courses;
 import com.internportal.util.Validator;
 
 import javax.swing.BorderFactory;
@@ -31,10 +32,7 @@ public class RegisterFrame extends JFrame {
     private static final Color ERROR_COLOR = new Color(0xC62828);
     private static final Color PRIMARY_COLOR = new Color(0x1E5AA8);
 
-    private static final String[] COURSES = {
-            "B.Tech CSE", "B.Tech IT", "B.Tech ECE", "B.Tech (Other)",
-            "BCA", "MCA", "B.Sc (CS/IT)", "M.Tech", "Other"
-    };
+    private static final String[] COURSES = Courses.ALL;
 
     private final JTextField nameField = new JTextField();
     private final JTextField emailField = new JTextField();

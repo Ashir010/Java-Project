@@ -4,7 +4,9 @@ import com.internportal.service.ServiceException;
 import com.internportal.service.ServiceTask;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -39,6 +41,7 @@ public abstract class BaseTablePanel<T> extends JPanel {
     private final TableRowSorter<DefaultTableModel> sorter;
     private final JTextField searchField = new JTextField();
     private final JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+    private final JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
     private final JLabel statusLabel = new JLabel(" ");
     private List<T> items = new ArrayList<>();
 
@@ -82,9 +85,8 @@ public abstract class BaseTablePanel<T> extends JPanel {
             public void changedUpdate(DocumentEvent e) { applyFilter(); }
         });
 
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        top.setOpaque(false);
-        top.add(searchField);
+        topBar.setOpaque(false);
+        topBar.add(searchField);
 
         buttonBar.setOpaque(false);
         JPanel bottom = new JPanel(new BorderLayout());
@@ -92,7 +94,7 @@ public abstract class BaseTablePanel<T> extends JPanel {
         bottom.add(buttonBar, BorderLayout.WEST);
         bottom.add(statusLabel, BorderLayout.EAST);
 
-        add(top, BorderLayout.NORTH);
+        add(topBar, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
     }
@@ -117,6 +119,12 @@ public abstract class BaseTablePanel<T> extends JPanel {
         button.addActionListener(e -> action.run());
         buttonBar.add(button);
         return button;
+    }
+
+    /** Adds a control (for example a filter drop-down) to the top bar, next to the search box. */
+    protected void addFilterComponent(JComponent component) {
+        topBar.add(Box.createHorizontalStrut(10));
+        topBar.add(component);
     }
 
     /** The item for the selected row, or null if nothing is selected. */
