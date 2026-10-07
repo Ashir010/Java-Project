@@ -2,16 +2,24 @@ package com.internportal.view.admin;
 
 import com.internportal.model.ApplicationRecord;
 import com.internportal.model.ApplicationStatus;
+import com.internportal.model.DocumentType;
 import com.internportal.model.Internship;
+import com.internportal.model.IssuedDocument;
 import com.internportal.service.ApplicationReviewService;
 import com.internportal.service.CatalogService;
+import com.internportal.service.DocumentService;
 import com.internportal.service.ServiceException;
+import com.internportal.util.SessionManager;
 import com.internportal.view.common.BaseTablePanel;
+import com.internportal.view.common.DocumentActions;
 import com.internportal.view.common.ResumeOpener;
 import com.internportal.view.common.StatusCellRenderer;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -33,6 +41,7 @@ public class ApplicationsPanel extends BaseTablePanel<ApplicationRecord> {
 
     private final ApplicationReviewService service = new ApplicationReviewService();
     private final CatalogService catalogService = new CatalogService();
+    private final DocumentService documentService = new DocumentService();
 
     private final JComboBox<InternshipOption> internshipBox = new JComboBox<>();
     private final JComboBox<String> statusBox = new JComboBox<>();
@@ -65,6 +74,8 @@ public class ApplicationsPanel extends BaseTablePanel<ApplicationRecord> {
         addToolbarButton("Reject", () -> changeStatus(ApplicationStatus.REJECTED));
         addToolbarButton("View Student", this::onViewStudent);
         addToolbarButton("View Resume", this::onViewResume);
+        JButton[] issueButton = new JButton[1];
+        issueButton[0] = addToolbarButton("Issue Document...", () -> showDocumentMenu(issueButton[0]));
         addToolbarButton("Refresh", this::reloadAll);
 
         // Reload every time the admin opens this page, so new applications always show
@@ -212,6 +223,70 @@ public class ApplicationsPanel extends BaseTablePanel<ApplicationRecord> {
     }
 
     // ---------------------------------------------------------------- Helpers
+
+    private void showDocumentMenu(JButton anchor) {
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem offer = new JMenuItem("Offer Letter");
+        offer.addActionListener(e -> onIssue(DocumentType.OFFER_LETTER));
+        menu.add(offer);
+
+        JMenuItem certificate = new JMenuItem("Completion Certificate");
+        certificate.addActionListener(e -> onIssue(DocumentType.COMPLETION_CERTIFICATE));
+        menu.add(certificate);
+
+        menu.show(anchor, 0, anchor.getHeight());
+    }
+
+    private void onIssue(DocumentType type) {
+        ApplicationRecord r = getSelectedItem();
+        if (r == null) {
+            showInfo("Select an application first.");
+            return;
+        }
+        ApplicationStatus status = r.getStatus();
+        boolean allowed = type == DocumentType.OFFER_LETTER
+                ? status == ApplicationStatus.SELECTED || status == ApplicationStatus.COMPLETED
+                : status == ApplicationStatus.COMPLETED;
+        if (!allowed) {
+            showInfo(type == DocumentType.OFFER_LETTER
+                    ? "An offer letter can only be issued to a selected student. This application is " + status + "."
+                    : "A completion certificate can only be issued after the internship is completed. "
+                      + "This application is " + status + ".");
+            return;
+        }
+        if (!confirm("Generate the " + type.getLabel() + " for " + r.getStudentName()
+                + "\n(" + r.getInternshipTitle() + " at " + r.getCompanyName() + ")?")) {
+            return;
+        }
+
+        int applicationId = r.getApplicationId();
+        int adminId = SessionManager.getInstance().getCurrentUser().getUserId();
+
+        new SwingWorker<IssuedDocument, Void>() {
+            @Override
+            protected IssuedDocument doInBackground() throws ServiceException {
+                return type == DocumentType.OFFER_LETTER
+                        ? documentService.generateOfferLetter(applicationId, adminId)
+                        : documentService.generateCertificate(applicationId, adminId);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    IssuedDocument doc = get();
+                    if (confirm("The " + type.getLabel() + " was created (reference " + doc.getReferenceNo()
+                            + ").\nOpen it now?")) {
+                        DocumentActions.open(ApplicationsPanel.this, doc);
+                    }
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException ex) {
+                    showError(messageOf(ex.getCause()));
+                }
+            }
+        }.execute();
+    }
 
     private void onViewResume() {
         ApplicationRecord r = getSelectedItem();
