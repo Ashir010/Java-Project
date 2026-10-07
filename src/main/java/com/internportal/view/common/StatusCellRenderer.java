@@ -44,6 +44,14 @@ public class StatusCellRenderer extends DefaultTableCellRenderer {
                 return GRAY;
             case "APPLIED":
                 return BLUE;
+            case "GRADED":
+                return GREEN;
+            case "SUBMITTED":
+                return BLUE;
+            case "PENDING":
+                return ORANGE;
+            case "NOT STARTED":
+                return GRAY;
             default:
                 return null;
         }

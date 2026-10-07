@@ -150,6 +150,12 @@ public class CatalogService {
         if (newPosting && i.getDeadline().isBefore(LocalDate.now())) {
             throw new ServiceException("The deadline cannot be in the past.");
         }
+        if (i.getStartDate() == null) {
+            throw new ServiceException("Please choose the internship start date.");
+        }
+        if (i.getStartDate().isBefore(i.getDeadline())) {
+            throw new ServiceException("The internship cannot start before the application deadline.");
+        }
     }
 
     /** Trims the text; blank becomes null. */

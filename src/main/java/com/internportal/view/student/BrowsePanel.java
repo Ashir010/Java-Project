@@ -22,10 +22,11 @@ public class BrowsePanel extends BaseTablePanel<InternshipListing> {
     private final int studentId;
 
     public BrowsePanel() {
-        super(new String[]{"Title", "Company", "Stipend (INR)", "Weeks", "Deadline", "Status"});
+        super(new String[]{"Title", "Company", "Stipend (INR)", "Duration", "Deadline", "Status"});
         studentId = SessionManager.getInstance().getCurrentUser().getUserId();
 
         getTable().getColumnModel().getColumn(STATUS_COLUMN).setCellRenderer(new StatusCellRenderer());
+        getTable().getColumnModel().getColumn(3).setPreferredWidth(240);
         getTable().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -50,7 +51,7 @@ public class BrowsePanel extends BaseTablePanel<InternshipListing> {
     protected Object[] toRow(InternshipListing listing) {
         Internship i = listing.getInternship();
         return new Object[]{
-                i.getTitle(), i.getCompanyName(), i.getStipend(), i.getDurationWeeks(),
+                i.getTitle(), i.getCompanyName(), i.getStipend(), i.getPeriod(),
                 i.getDeadline(), listing.isApplied() ? "APPLIED" : ""
         };
     }

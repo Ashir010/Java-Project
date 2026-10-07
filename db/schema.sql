@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS internships (
   description    TEXT,
   stipend        DECIMAL(10,2) NOT NULL DEFAULT 0,
   duration_weeks INT NOT NULL,
+  start_date     DATE NOT NULL,
   deadline       DATE NOT NULL,
   status         ENUM('OPEN','CLOSED') NOT NULL DEFAULT 'OPEN',
   created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -65,4 +66,20 @@ CREATE TABLE IF NOT EXISTS application_history (
   changed_on     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (application_id) REFERENCES applications(application_id) ON DELETE CASCADE,
   INDEX idx_history_application (application_id)
+);
+
+CREATE TABLE IF NOT EXISTS logbook_entries (
+  entry_id       INT AUTO_INCREMENT PRIMARY KEY,
+  application_id INT NOT NULL,
+  week_no        INT NOT NULL,
+  summary        TEXT NOT NULL,
+  submitted_on   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  grade          INT NULL,
+  remarks        TEXT NULL,
+  graded_by      INT NULL,
+  graded_on      TIMESTAMP NULL,
+  UNIQUE KEY uq_application_week (application_id, week_no),
+  CONSTRAINT chk_logbook_grade CHECK (grade IS NULL OR grade BETWEEN 0 AND 10),
+  FOREIGN KEY (application_id) REFERENCES applications(application_id) ON DELETE CASCADE,
+  FOREIGN KEY (graded_by) REFERENCES users(user_id) ON DELETE SET NULL
 );

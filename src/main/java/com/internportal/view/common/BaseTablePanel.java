@@ -15,6 +15,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -42,6 +43,7 @@ public abstract class BaseTablePanel<T> extends JPanel {
     private final JTextField searchField = new JTextField();
     private final JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
     private final JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    private final JPanel bottom = new JPanel(new BorderLayout());
     private final JLabel statusLabel = new JLabel(" ");
     private List<T> items = new ArrayList<>();
 
@@ -64,6 +66,8 @@ public abstract class BaseTablePanel<T> extends JPanel {
         };
 
         table = new JTable(model);
+        table.setDefaultRenderer(Object.class, new PaddedCellRenderer(SwingConstants.CENTER));
+        table.setDefaultRenderer(Number.class, new PaddedCellRenderer(SwingConstants.CENTER));
         table.setRowHeight(30);
         table.setFillsViewportHeight(true);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -89,7 +93,6 @@ public abstract class BaseTablePanel<T> extends JPanel {
         topBar.add(searchField);
 
         buttonBar.setOpaque(false);
-        JPanel bottom = new JPanel(new BorderLayout());
         bottom.setOpaque(false);
         bottom.add(buttonBar, BorderLayout.WEST);
         bottom.add(statusLabel, BorderLayout.EAST);
@@ -125,6 +128,20 @@ public abstract class BaseTablePanel<T> extends JPanel {
     protected void addFilterComponent(JComponent component) {
         topBar.add(Box.createHorizontalStrut(10));
         topBar.add(component);
+    }
+
+    /** Adds a component (for example a text area) between the table and the button row. */
+    protected void setDetailComponent(JComponent component) {
+        bottom.add(component, BorderLayout.NORTH);
+    }
+
+    /** The items currently shown in the table, in table-model order. */
+    protected List<T> getItems() {
+        return items;
+    }
+
+    /** Called on the UI thread after the table has been reloaded. Subclasses can override it. */
+    protected void onLoaded() {
     }
 
     /** The item for the selected row, or null if nothing is selected. */
@@ -197,6 +214,7 @@ public abstract class BaseTablePanel<T> extends JPanel {
                         model.addRow(toRow(item));
                     }
                     statusLabel.setText(items.size() + " record(s)");
+                    onLoaded();
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException ex) {

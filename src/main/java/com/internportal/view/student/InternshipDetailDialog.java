@@ -46,6 +46,8 @@ public class InternshipDetailDialog extends JDialog {
 
         JPanel facts = new JPanel(new GridLayout(0, 2, 12, 6));
         addFact(facts, "Stipend", String.format("INR %,.0f per month", internship.getStipend()));
+        addFact(facts, "Internship period", internship.getStartDate().format(DATE_FORMAT)
+                + " to " + internship.getEndDate().format(DATE_FORMAT));
         addFact(facts, "Duration", internship.getDurationWeeks() + " weeks");
         addFact(facts, "Apply by", internship.getDeadline().format(DATE_FORMAT));
 

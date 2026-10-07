@@ -20,8 +20,9 @@ public class InternshipsPanel extends BaseTablePanel<Internship> {
     private final CatalogService service = new CatalogService();
 
     public InternshipsPanel() {
-        super(new String[]{"Title", "Company", "Stipend (INR)", "Weeks", "Deadline", "Status"});
+        super(new String[]{"Title", "Company", "Stipend (INR)", "Duration", "Deadline", "Status"});
         getTable().getColumnModel().getColumn(STATUS_COLUMN).setCellRenderer(new StatusCellRenderer());
+        getTable().getColumnModel().getColumn(3).setPreferredWidth(240);
 
         addToolbarButton("Add", () -> openForm(null));
         addToolbarButton("Edit", this::onEdit);
@@ -37,7 +38,7 @@ public class InternshipsPanel extends BaseTablePanel<Internship> {
     @Override
     protected Object[] toRow(Internship i) {
         return new Object[]{
-                i.getTitle(), i.getCompanyName(), i.getStipend(), i.getDurationWeeks(),
+                i.getTitle(), i.getCompanyName(), i.getStipend(), i.getPeriod(),
                 i.getDeadline(), i.getStatus().name()
         };
     }

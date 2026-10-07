@@ -12,7 +12,7 @@ public class StudentDashboard extends DashboardFrame {
         addPage("My Profile", new ProfilePanel());
         addPage("Browse Internships", new BrowsePanel());
         addPage("My Applications", new MyApplicationsPanel());
-        addPage("Weekly Logbook", new PlaceholderPanel("Weekly Logbook"));
+        addPage("Weekly Logbook", new LogbookPanel());
         addPage("My Documents", new PlaceholderPanel("My Documents"));
 
         showPage("My Profile");

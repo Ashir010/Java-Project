@@ -17,7 +17,7 @@ public class ApplicationDAO {
     /** OPEN internships whose deadline has not passed, each flagged if this student already applied. */
     public List<InternshipListing> findAvailableFor(int studentId) throws SQLException {
         String sql = "SELECT i.internship_id, i.company_id, c.company_name, i.title, i.description, "
-                   + "i.stipend, i.duration_weeks, i.deadline, i.status, "
+                   + "i.stipend, i.duration_weeks, i.start_date, i.deadline, i.status, "
                    + "(a.application_id IS NOT NULL) AS applied "
                    + "FROM internships i "
                    + "JOIN companies c ON c.company_id = i.company_id "
@@ -38,6 +38,7 @@ public class ApplicationDAO {
                     i.setDescription(rs.getString("description"));
                     i.setStipend(rs.getBigDecimal("stipend"));
                     i.setDurationWeeks(rs.getInt("duration_weeks"));
+                    i.setStartDate(rs.getDate("start_date").toLocalDate());
                     i.setDeadline(rs.getDate("deadline").toLocalDate());
                     i.setStatus(InternshipStatus.valueOf(rs.getString("status")));
                     list.add(new InternshipListing(i, rs.getBoolean("applied")));
